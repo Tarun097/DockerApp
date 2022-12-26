@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  backend-service:
+    build: ./backend/python-server
+    image: backend
+    volumes:
+      - ./backend/python-server:/usr/src/app
+    ports:
+      - 5001:80
+    networks:
+      - backend
+    restart: on-failure
+
+  react-app:
+    build: ./frontend/react-app
+    image: react-frontend
+    volumes:
+      - ./frontend/react-app:/usr/src/app
+    ports:
+      - 5000:3000
+    depends_on:
+      - backend-service
+    networks:
+      - backend
+
+  php-app:
+    image: php:apache
+    volumes:
+      - ./frontend/php-app:/var/www/html
+    ports:
+      - 8080:80
+    depends_on:
+      - backend-service
+    networks:
+      - backend
+
+networks:
+  backend:
